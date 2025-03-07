@@ -1,0 +1,33 @@
+name: Monthly Web Scraper
+
+on:
+  schedule:
+    - cron: "0 0 1 * *"  # Runs at midnight on the first day of every month
+  workflow_dispatch:  # Allows manual execution
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Install Dependencies
+        run: pip install requests beautifulsoup4 pandas
+
+      - name: Run Scraper
+        run: python scraper.py
+
+      - name: Commit and Push Data
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add autochek_cars.csv
+          git commit -m "Updated scraped data" || echo "No changes to commit"
+          git push
+        continue-on-error: true  # Prevents failure if there's no new data
