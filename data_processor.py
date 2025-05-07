@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 def convert_mileage(mileage):
     parts = mileage.split()
     # Ensure there is at least one part (value)
