@@ -2,6 +2,7 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import pandas as pd
+from data_processor import convert_mileage, process_data
 
 BASE_URL = "https://autochek.africa/ng/cars-for-sale?page_number={}"
 
@@ -61,39 +62,6 @@ for page in range(1, total_pages + 1):
     all_cars.extend(scrape_page(page_url))
     time.sleep(2)  # Avoid getting blocked
 
-
-# Convert Mileage to Miles (Remove 'K' and convert kms to miles)
-def convert_mileage(mileage):
-    parts = mileage.split()
-    # Ensure there is at least one part (value)
-    if len(parts) == 2:
-        value, unit = parts
-    elif len(parts) == 1:
-        value, unit = parts[0], "miles"  # Assume miles if the unit is missing
-    else:
-        return None  # Handle unexpected cases
-    # Handle non-numeric values
-    if not value.replace("K", "").replace(".", "").isdigit():
-        return None  # Return None for non-numeric values like 'local'
-
-    value = float(value.replace("K", "")) * 1000  # Convert K to number
-    if unit == "kms":
-        value *= 0.621371  # Convert km to miles
-    return int(value)
-
-
-def process_data(all_cars):
-    df = pd.DataFrame(all_cars)
-    # Extract Year from Car Name
-    df["Year"] = df["Car Name"].str.split().str[0].astype(int)
-    # Convert Price to Integer
-    df["Price"] = df["Price"].str.replace("₦", "").str.replace(",", "").astype(int)
-    # convert to miles
-    df["Mileage"] = df["Mileage"].apply(convert_mileage)
-    # Reorder Columns
-    df = df[["Year", "Car Name", "Condition", "Mileage", "Engine Type", "Price", "Location"]]
-    # Display DataFrame
-    df.to_csv('autochek_cars.csv', index=False)
 # call the funtion
 process_data(all_cars)
-print(f"Scraped {len(all_cars)} cars. Data saved to 'autochek_cars.csv'")
+
