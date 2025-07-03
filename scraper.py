@@ -4,7 +4,7 @@ import time
 import pandas as pd
 from data_processor import convert_mileage, process_data
 
-BASE_URL = "https://autochek.africa/ng/cars-for-sale?page_number={}"
+BASE_URL = "https://autochek.africa/gh/cars-for-sale?page_number={}"
 
 # Function to extract total pages
 def get_total_pages(soup):
